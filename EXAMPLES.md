@@ -22,6 +22,20 @@ final BitfinexWebsocketClient bitfinexClient = BitfinexClientFactory.newSimpleCl
 bitfinexClient.connect();
 ```
 
+## Using a custom WebSocket endpoint
+
+Useful for integration testing against a mock server:
+
+```java
+final BitfinexWebsocketConfiguration config = new BitfinexWebsocketConfiguration();
+config.setWebsocketEndpointUrl("ws://localhost:8080/ws/2");
+
+final BitfinexWebsocketClient client = BitfinexClientFactory.newSimpleClient(config);
+client.connect();
+```
+
+The default endpoint is `wss://api.bitfinex.com/ws/2`.
+
 ## Provided API key permissions
 ```java
 final BitfinexApiKeyPermissions permissions = client.getApiKeyPermissions();

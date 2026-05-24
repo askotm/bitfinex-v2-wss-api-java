@@ -1,3 +1,5 @@
+> **Fork notice:** This is an actively maintained fork of [jnidzwetzki/bitfinex-v2-wss-api-java](https://github.com/jnidzwetzki/bitfinex-v2-wss-api-java), which appears to be no longer maintained.
+
 # An unofficial Java implementation of the Bitfinex Websocket (v2) API
 
 <a href="https://github.com/jnidzwetzki/bitfinex-v2-wss-api-java/actions/workflows/build.yml">

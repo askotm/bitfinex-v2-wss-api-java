@@ -51,7 +51,7 @@ public class ExecutedTradeHandler implements ChannelCallbackHandler {
         try {
             final List<BitfinexExecutedTrade> trades = new ArrayList<>();
 
-            if( action.equals("tu")) {
+            if ("tu".equals(action)) {
                 return; // Ignore tu messages (see issue #13)
             }
 

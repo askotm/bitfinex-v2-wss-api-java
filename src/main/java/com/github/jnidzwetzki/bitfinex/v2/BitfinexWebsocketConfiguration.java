@@ -82,6 +82,8 @@ public class BitfinexWebsocketConfiguration {
      */
     private boolean autoReconnect = true;
 
+    private String websocketEndpointUrl = SimpleBitfinexApiBroker.BITFINEX_URI;
+
     public BitfinexWebsocketConfiguration() {
 
     }
@@ -98,6 +100,15 @@ public class BitfinexWebsocketConfiguration {
         this.connectionEstablishingDelay = copy.connectionEstablishingDelay;
         this.errorPolicy = copy.errorPolicy;
         this.autoReconnect = copy.autoReconnect;
+        this.websocketEndpointUrl = copy.websocketEndpointUrl;
+    }
+
+    public String getWebsocketEndpointUrl() {
+        return websocketEndpointUrl;
+    }
+
+    public void setWebsocketEndpointUrl(final String websocketEndpointUrl) {
+        this.websocketEndpointUrl = websocketEndpointUrl;
     }
 
     public void setApiCredentials(final String apiKey, final String apiSecret) {
@@ -108,6 +119,13 @@ public class BitfinexWebsocketConfiguration {
 
     public String getApiKey() {
         return apiKey;
+    }
+
+    public String getMaskedApiKey() {
+        if (apiKey == null || apiKey.length() <= 4) {
+            return "****";
+        }
+        return "****" + apiKey.substring(apiKey.length() - 4);
     }
 
     public String getApiSecret() {

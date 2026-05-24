@@ -197,7 +197,7 @@ public class OrderManagerTest {
      */
     @Test
     public void testOrderChannelHandler4() throws BitfinexClientException {
-        final String jsonString = "[0,\"oc\",[11291120775,null,null,\"tNEOBTC\",1524661302976,1524661303001,0,-0.41291886,\"MARKET\",null,null,null,0,\"INSUFFICIENT BALANCE (G1) was: ACTIVE (note:POSCLOSE), PARTIALLY FILLED @ 0.008049(-0.41291886)\",null,null,0,0.008049,null,null,null,null,null,0,0,0,null,null,\"\",null,null,null]]";
+        final String jsonString = "[0,\"oc\",[11291120775,null,null,\"tETHBTC\",1524661302976,1524661303001,0,-0.41291886,\"MARKET\",null,null,null,0,\"INSUFFICIENT BALANCE (G1) was: ACTIVE (note:POSCLOSE), PARTIALLY FILLED @ 0.008049(-0.41291886)\",null,null,0,0.008049,null,null,null,null,null,0,0,0,null,null,\"\",null,null,null]]";
 
         final JSONArray jsonArray = new JSONArray(jsonString);
         final BitfinexWebsocketClient bitfinexApiBroker = TestHelper.buildMockedBitfinexConnection();

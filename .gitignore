@@ -41,3 +41,8 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
+
+# Claude Code
+.claude/
+CLAUDE.md
+/.java-version

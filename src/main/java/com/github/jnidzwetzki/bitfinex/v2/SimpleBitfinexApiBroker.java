@@ -251,7 +251,7 @@ public class SimpleBitfinexApiBroker implements Closeable, BitfinexWebsocketClie
 
 		final AuthCallback auth = new AuthCallback();
 		auth.onAuthenticationSuccessEvent(permissions -> {
-		    logger.info("authentication succeeded for key {}", configuration.getApiKey());
+		    logger.info("authentication succeeded for key {}", configuration.getMaskedApiKey());
 			final BitfinexAccountSymbol symbol = BitfinexSymbols.account(permissions, configuration.getApiKey());
 			final AccountInfoHandler handler = new AccountInfoHandler(ACCCOUNT_INFO_CHANNEL, symbol);
 			handler.onHeartbeatEvent(timestamp -> this.updateConnectionHeartbeat());
@@ -267,7 +267,7 @@ public class SimpleBitfinexApiBroker implements Closeable, BitfinexWebsocketClie
 			callbackRegistry.acceptConnectionStateChange(BitfinexConnectionStateEnum.AUTHENTICATION_SUCCESS);
 		});
 		auth.onAuthenticationFailedEvent(permissions -> {
-            logger.info("authentication failed for key {}", configuration.getApiKey());
+            logger.info("authentication failed for key {}", configuration.getMaskedApiKey());
             final BitfinexAccountSymbol symbol = BitfinexSymbols.account(permissions, configuration.getApiKey());
 			callbackRegistry.acceptAuthenticationFailedEvent(symbol);
 			callbackRegistry.acceptConnectionStateChange(BitfinexConnectionStateEnum.AUTHENTICATION_FAILED);
@@ -315,7 +315,7 @@ public class SimpleBitfinexApiBroker implements Closeable, BitfinexWebsocketClie
 
             setupDefaultAccountInfoHandler();
 
-			websocketEndpoint = new WebsocketClientEndpoint(new URI(BITFINEX_URI),
+			websocketEndpoint = new WebsocketClientEndpoint(new URI(configuration.getWebsocketEndpointUrl()),
 					this::websocketCallback,
 					r -> callbackRegistry.acceptConnectionStateChange(BitfinexConnectionStateEnum.DISCONNECTION_BY_REMOTE),
 					t -> callbackRegistry.acceptConnectionStateChange(BitfinexConnectionStateEnum.DISCONNECTION_BY_REMOTE)
