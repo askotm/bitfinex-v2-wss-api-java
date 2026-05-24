@@ -35,7 +35,8 @@ public class BitfinexOrderBookSymbol implements BitfinexStreamSymbol {
 		P0,
 		P1,
 		P2,
-		P3
+		P3,
+		P4
 	}
 
 	/**

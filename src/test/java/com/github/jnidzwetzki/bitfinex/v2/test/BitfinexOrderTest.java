@@ -92,6 +92,29 @@ public class BitfinexOrderTest {
 	}
 	
 	@Test
+	public void testNewOrderFlagsRecognised() {
+		final BitfinexOrder order = new BitfinexOrder();
+
+		order.setOrderFlags(BitfinexOrderFlag.FOK.getFlag());
+		Assert.assertTrue(order.getOrderFlags().contains(BitfinexOrderFlag.FOK));
+
+		order.setOrderFlags(BitfinexOrderFlag.IOC.getFlag());
+		Assert.assertTrue(order.getOrderFlags().contains(BitfinexOrderFlag.IOC));
+
+		order.setOrderFlags(BitfinexOrderFlag.TIMESTAMP.getFlag());
+		Assert.assertTrue(order.getOrderFlags().contains(BitfinexOrderFlag.TIMESTAMP));
+	}
+
+	@Test
+	public void testFokAndHiddenCombined() {
+		final BitfinexOrder order = new BitfinexOrder();
+		order.setOrderFlags(BitfinexOrderFlag.FOK.getFlag() | BitfinexOrderFlag.HIDDEN.getFlag());
+		Assert.assertTrue(order.getOrderFlags().contains(BitfinexOrderFlag.FOK));
+		Assert.assertTrue(order.getOrderFlags().contains(BitfinexOrderFlag.HIDDEN));
+		Assert.assertEquals(2, order.getOrderFlags().size());
+	}
+
+	@Test
 	public void testOrderStatusFlags3() {
 		final BitfinexOrder bitfinexNewOrder1 = new BitfinexOrder();
 		bitfinexNewOrder1.setApiKey("abc");

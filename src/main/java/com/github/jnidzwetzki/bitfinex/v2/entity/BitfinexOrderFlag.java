@@ -19,7 +19,13 @@ package com.github.jnidzwetzki.bitfinex.v2.entity;
 
 public enum BitfinexOrderFlag {
 
-	// one cancels other order 
+	// fill-or-kill
+	FOK(8),
+
+	// immediate-or-cancel
+	IOC(16),
+
+	// one cancels other order
 	OCO(16384),
 	
 	// post-only limit order 
@@ -35,7 +41,10 @@ public enum BitfinexOrderFlag {
 	POS_CLOSE(512),
 	
 	// Reduce margin position only
-	REDUCE_ONLY(1024);
+	REDUCE_ONLY(1024),
+
+	// append server timestamps to order responses
+	TIMESTAMP(32768);
 	
 	/**
 	 * The order flag

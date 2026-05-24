@@ -19,6 +19,7 @@ package com.github.jnidzwetzki.bitfinex.v2;
 
 public enum BitfinexConnectionFeature {
 	
+	TIMESTAMP(32768),
 	SEQ_ALL(65536),
 	CHECKSUM(131072);
 	

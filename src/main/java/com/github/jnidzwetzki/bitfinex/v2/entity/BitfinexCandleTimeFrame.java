@@ -26,10 +26,13 @@ public enum BitfinexCandleTimeFrame {
 	MINUTES_15(TimeUnit.MINUTES.toMillis(15), "15m"),
 	MINUTES_30(TimeUnit.MINUTES.toMillis(30), "30m"),
 	HOUR_1(TimeUnit.HOURS.toMillis(1), "1h"),
+	HOUR_2(TimeUnit.HOURS.toMillis(2), "2h"),
 	HOUR_3(TimeUnit.HOURS.toMillis(3), "3h"),
+	HOUR_4(TimeUnit.HOURS.toMillis(4), "4h"),
 	HOUR_6(TimeUnit.HOURS.toMillis(6), "6h"),
 	HOUR_12(TimeUnit.HOURS.toMillis(12), "12h"),
 	DAY_1(TimeUnit.DAYS.toMillis(1), "1D"),
+	WEEK_1(TimeUnit.DAYS.toMillis(7), "1W"),
 	DAY_14(TimeUnit.DAYS.toMillis(14), "14D"),
 	MONTH_1(TimeUnit.DAYS.toMillis(30), "1M");
 

@@ -1,5 +1,12 @@
 # Fork versions (oxefork)
 
+## 0.7.9-oxefork-p4 (2026-05-24)
+* Protocol (M1): added `HOUR_2 ("2h")`, `HOUR_4 ("4h")`, `WEEK_1 ("1W")` to `BitfinexCandleTimeFrame`; `fromSymbolString` previously threw on these server-sent keys
+* Protocol (M3): added `FOK (8)`, `IOC (16)`, `TIMESTAMP (32768)` to `BitfinexOrderFlag`; bits 8/16 were silently dropped by `setOrderFlags(int)`
+* Protocol (M4): added `TIMESTAMP (32768)` to `BitfinexConnectionFeature`; the conf flag was previously unavailable
+* Protocol (M5): added `P4` to `BitfinexOrderBookSymbol.Precision`; `fromJSON` previously threw `IllegalArgumentException` on `"prec":"P4"`
+* Tests: `BitfinexCandleTimeFrameTest` (round-trip + millis), `BitfinexConnectionFeatureTest` (uniqueness + power-of-two), extended `BitfinexOrderTest` (FOK/IOC/TIMESTAMP parsing and combination), extended `BitfinexSymbolsTest` (P4 construction and `fromJSON`)
+
 ## 0.7.9-oxefork-p3 (2026-05-24)
 * Protocol fix (M2): added `IOC` and `EXCHANGE_IOC` to `BitfinexOrderType`; `OrderHandler` previously threw `IllegalArgumentException` when the server sent either type
 * Tests: added `BitfinexOrderTypeTest` (round-trips all protocol type strings) and `OrderHandlerTest` (parses IOC / EXCHANGE IOC through the full handler path)

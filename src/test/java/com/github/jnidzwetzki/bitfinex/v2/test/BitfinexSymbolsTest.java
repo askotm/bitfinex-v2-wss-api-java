@@ -79,6 +79,27 @@ public class BitfinexSymbolsTest {
 	public void testSymbolCreationInvalid() throws BitfinexCommandException {
         BitfinexSymbols.orderBook(BitfinexCurrencyPair.of("BTC", "USD"), BitfinexOrderBookSymbol.Precision.R0, BitfinexOrderBookSymbol.Frequency.F0, 100);
 	}
+
+	@Test
+	public void testOrderBookPrecisionP4() {
+		final BitfinexOrderBookSymbol symbol = BitfinexSymbols.orderBook(
+				BitfinexCurrencyPair.of("BTC", "USD"),
+				BitfinexOrderBookSymbol.Precision.P4,
+				BitfinexOrderBookSymbol.Frequency.F0,
+				25);
+		Assert.assertEquals(BitfinexOrderBookSymbol.Precision.P4, symbol.getPrecision());
+	}
+
+	@Test
+	public void testOrderBookFromJsonP4() {
+		final org.json.JSONObject json = new org.json.JSONObject();
+		json.put("symbol", "tBTCUSD");
+		json.put("prec", "P4");
+		json.put("freq", "F0");
+		json.put("len", 25);
+		final BitfinexOrderBookSymbol symbol = BitfinexOrderBookSymbol.fromJSON(json);
+		Assert.assertEquals(BitfinexOrderBookSymbol.Precision.P4, symbol.getPrecision());
+	}
 	
 	/**
 	 * Test the funding symbol
