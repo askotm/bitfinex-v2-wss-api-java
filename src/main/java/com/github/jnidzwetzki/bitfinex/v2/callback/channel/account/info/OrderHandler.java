@@ -123,7 +123,9 @@ public class OrderHandler implements ChannelCallbackHandler {
         order.setPriceTrailing(json.optBigDecimal(18, null));
         order.setPriceAuxLimit(json.optBigDecimal(19, null));
     
-        final String parentOrderId = json.optString(25, null);
+        order.setNotify(json.optInt(24, 0) == 1);
+        order.setHidden(json.optInt(25, 0) == 1);
+        final String parentOrderId = json.optString(26, null);
         if (parentOrderId != null) {
             order.setParentOrderId(Long.parseLong(parentOrderId));
         }

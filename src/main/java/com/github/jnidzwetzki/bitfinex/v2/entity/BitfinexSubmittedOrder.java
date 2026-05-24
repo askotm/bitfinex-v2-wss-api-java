@@ -86,6 +86,11 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
      */
     private boolean notify;
 
+    /**
+     * hidden flag
+     */
+    private boolean hidden;
+
     public Long getOrderId() {
         return orderId;
     }
@@ -184,6 +189,14 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
         this.notify = notify;
     }
 
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -192,6 +205,7 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
         BitfinexSubmittedOrder that = (BitfinexSubmittedOrder) o;
         return noVarRates == that.noVarRates &&
                 notify == that.notify &&
+                hidden == that.hidden &&
                 Objects.equals(orderId, that.orderId) &&
                 Objects.equals(createdTimestamp, that.createdTimestamp) &&
                 Objects.equals(updatedTimestamp, that.updatedTimestamp) &&
@@ -205,7 +219,7 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), orderId, createdTimestamp, updatedTimestamp, amount, amountAtCreation, status, priceAverage, parentOrderId, parentOrderType, noVarRates, notify);
+        return Objects.hash(super.hashCode(), orderId, createdTimestamp, updatedTimestamp, amount, amountAtCreation, status, priceAverage, parentOrderId, parentOrderType, noVarRates, notify, hidden);
     }
 
     @Override
@@ -223,6 +237,7 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
                 ", parentOrderType=" + parentOrderType +
                 ", noVarRates=" + noVarRates +
                 ", notify=" + notify +
+                ", hidden=" + hidden +
                 ']';
     }
 }

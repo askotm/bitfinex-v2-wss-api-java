@@ -285,6 +285,35 @@ public class OrderManagerTest {
 
 
     /**
+     * Test that NOTIFY (idx 24), HIDDEN (idx 25), and parentOrderId (idx 26) are parsed from correct indices
+     *
+     * @throws BitfinexClientException
+     */
+    @Test
+    public void testOrderChannelHandlerFieldLayout() throws BitfinexClientException {
+        final String jsonString = "[0,\"on\",[6784335053,null,1514956504945000,\"tIOTUSD\",1514956505134,1514956505164,-24.175121,-24.175121,\"EXCHANGE STOP\",null,null,null,0,\"ACTIVE\",null,null,3.84,0,null,null,null,null,null,0,1,1,99887766]]";
+        final JSONArray jsonArray = new JSONArray(jsonString);
+        final OrderHandler orderHandler = new OrderHandler(0, BitfinexSymbols.account(BitfinexApiKeyPermissions.ALL_PERMISSIONS, "api-key"));
+
+        final BitfinexSubmittedOrder[] captured = new BitfinexSubmittedOrder[1];
+        orderHandler.onSubmittedOrderEvent((a, eos) -> captured[0] = eos.iterator().next());
+        orderHandler.handleChannelData("on", jsonArray.getJSONArray(2));
+
+        Assert.assertTrue(captured[0].isNotify());
+        Assert.assertTrue(captured[0].isHidden());
+        Assert.assertEquals(Long.valueOf(99887766L), captured[0].getParentOrderId());
+
+        final String jsonString2 = "[0,\"on\",[6784335053,null,1514956504945000,\"tIOTUSD\",1514956505134,1514956505164,-24.175121,-24.175121,\"EXCHANGE STOP\",null,null,null,0,\"ACTIVE\",null,null,3.84,0,null,null,null,null,null,0,0,0,null]]";
+        final JSONArray jsonArray2 = new JSONArray(jsonString2);
+        orderHandler.onSubmittedOrderEvent((a, eos) -> captured[0] = eos.iterator().next());
+        orderHandler.handleChannelData("on", jsonArray2.getJSONArray(2));
+
+        Assert.assertFalse(captured[0].isNotify());
+        Assert.assertFalse(captured[0].isHidden());
+        Assert.assertNull(captured[0].getParentOrderId());
+    }
+
+    /**
      * Test the placement of an order
      *
      * @throws InterruptedException
