@@ -29,7 +29,9 @@ import com.github.jnidzwetzki.bitfinex.v2.BitfinexApiCallbackRegistry;
 import com.github.jnidzwetzki.bitfinex.v2.BitfinexWebsocketClient;
 import com.github.jnidzwetzki.bitfinex.v2.SimpleBitfinexApiBroker;
 import com.github.jnidzwetzki.bitfinex.v2.callback.channel.TickHandler;
+import com.github.jnidzwetzki.bitfinex.v2.entity.BitfinexFundingTick;
 import com.github.jnidzwetzki.bitfinex.v2.entity.currency.BitfinexCurrencyPair;
+import com.github.jnidzwetzki.bitfinex.v2.entity.currency.BitfinexFundingCurrency;
 import com.github.jnidzwetzki.bitfinex.v2.exception.BitfinexClientException;
 import com.github.jnidzwetzki.bitfinex.v2.manager.QuoteManager;
 import com.github.jnidzwetzki.bitfinex.v2.symbol.BitfinexSymbols;
@@ -53,6 +55,18 @@ public class TickHandlerTest {
     private static final double DELTA = 0.001;
 
     /**
+     * Creates a QuoteManager wired to a mock broker, suitable for driving a TickHandler.
+     */
+    private static QuoteManager newQuoteManager() {
+        final ExecutorService executor = MoreExecutors.newDirectExecutorService();
+        final BitfinexWebsocketClient broker = Mockito.mock(SimpleBitfinexApiBroker.class);
+        Mockito.when(broker.getCallbacks()).thenReturn(new BitfinexApiCallbackRegistry());
+        final QuoteManager manager = new QuoteManager(broker, executor);
+        Mockito.when(broker.getQuoteManager()).thenReturn(manager);
+        return manager;
+    }
+
+    /**
      * Test the parsing of one tick
      *
      * @throws BitfinexClientException
@@ -60,18 +74,11 @@ public class TickHandlerTest {
     @Test
     public void testTickUpdateAndNotify() throws BitfinexClientException {
 
-        final String callbackValue = "[26123,41.4645776,26129,33.68138507,2931,0.2231,26129,144327.10936387,26149,13139]";
-        final JSONArray jsonArray = new JSONArray(callbackValue);
+        final JSONArray jsonArray = new JSONArray(
+                "[26123,41.4645776,26129,33.68138507,2931,0.2231,26129,144327.10936387,26149,13139]");
 
-        final BitfinexCurrencyPair currencyPair = BitfinexCurrencyPair.of("BTC", "USD");
-        final BitfinexTickerSymbol symbol = BitfinexSymbols.ticker(currencyPair);
-
-        final ExecutorService executorService = MoreExecutors.newDirectExecutorService();
-        final BitfinexWebsocketClient bitfinexApiBroker = Mockito.mock(SimpleBitfinexApiBroker.class);
-        Mockito.when(bitfinexApiBroker.getCallbacks()).thenReturn(new BitfinexApiCallbackRegistry());
-
-        final QuoteManager tickerManager = new QuoteManager(bitfinexApiBroker, executorService);
-        Mockito.when(bitfinexApiBroker.getQuoteManager()).thenReturn(tickerManager);
+        final BitfinexTickerSymbol symbol = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("BTC", "USD"));
+        final QuoteManager tickerManager = newQuoteManager();
 
         tickerManager.registerTickCallback(symbol, (s, c) -> {
             Assert.assertEquals(symbol, s);
@@ -95,6 +102,44 @@ public class TickHandlerTest {
         tickHandler.handleChannelData(null, jsonArray);
 
         Assert.assertTrue(tickerManager.getHeartbeatForSymbol(symbol) != -1);
+    }
+
+    /**
+     * Funding ticker (fXXX) uses a 13-field layout (FRR, BID, BID_PERIOD, BID_SIZE, ASK, ASK_PERIOD,
+     * ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_REL, LAST_PRICE, VOLUME, HIGH, LOW) — different from the
+     * 10-field trading layout. Verifies each field lands in the correct BitfinexFundingTick slot.
+     */
+    @Test
+    public void testFundingTickUpdateAndNotify() throws BitfinexClientException {
+        final JSONArray jsonArray = new JSONArray(
+                "[0.00035,0.00033,2,120000.0,0.00036,30,85000.0,0.000005,0.0145,0.00034,9800000.0,0.00038,0.00031]");
+
+        final BitfinexTickerSymbol symbol = BitfinexSymbols.ticker(new BitfinexFundingCurrency("USD"));
+        final QuoteManager tickerManager = newQuoteManager();
+
+        tickerManager.registerTickCallback(symbol, (s, c) -> {
+            Assert.assertEquals(symbol, s);
+            Assert.assertSame(BitfinexFundingTick.class, c.getClass());
+            final BitfinexFundingTick ft = (BitfinexFundingTick) c;
+            Assert.assertEquals(0.00035, ft.getFrr().doubleValue(), DELTA);
+            Assert.assertEquals(0.00033, ft.getBid().doubleValue(), DELTA);
+            Assert.assertEquals(2.0, ft.getBidPeriod().doubleValue(), DELTA);
+            Assert.assertEquals(120000.0, ft.getBidSize().doubleValue(), DELTA);
+            Assert.assertEquals(0.00036, ft.getAsk().doubleValue(), DELTA);
+            Assert.assertEquals(30.0, ft.getAskPeriod().doubleValue(), DELTA);
+            Assert.assertEquals(85000.0, ft.getAskSize().doubleValue(), DELTA);
+            Assert.assertEquals(0.000005, ft.getDailyChange().doubleValue(), DELTA);
+            Assert.assertEquals(0.0145, ft.getDailyChangePerc().doubleValue(), DELTA);
+            Assert.assertEquals(0.00034, ft.getLastPrice().doubleValue(), DELTA);
+            Assert.assertEquals(9800000.0, ft.getVolume().doubleValue(), DELTA);
+            Assert.assertEquals(0.00038, ft.getHigh().doubleValue(), DELTA);
+            Assert.assertEquals(0.00031, ft.getLow().doubleValue(), DELTA);
+        });
+
+        final TickHandler tickHandler = new TickHandler(0, symbol);
+        tickHandler.onTickEvent(tickerManager::handleNewTick);
+
+        tickHandler.handleChannelData(null, jsonArray);
     }
 
 }

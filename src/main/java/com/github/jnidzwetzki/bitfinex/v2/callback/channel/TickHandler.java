@@ -17,12 +17,13 @@
  *******************************************************************************/
 package com.github.jnidzwetzki.bitfinex.v2.callback.channel;
 
-import java.math.BigDecimal;
 import java.util.function.BiConsumer;
 
 import org.json.JSONArray;
 
+import com.github.jnidzwetzki.bitfinex.v2.entity.BitfinexFundingTick;
 import com.github.jnidzwetzki.bitfinex.v2.entity.BitfinexTick;
+import com.github.jnidzwetzki.bitfinex.v2.entity.currency.BitfinexFundingCurrency;
 import com.github.jnidzwetzki.bitfinex.v2.exception.BitfinexClientException;
 import com.github.jnidzwetzki.bitfinex.v2.symbol.BitfinexStreamSymbol;
 import com.github.jnidzwetzki.bitfinex.v2.symbol.BitfinexTickerSymbol;
@@ -44,7 +45,8 @@ public class TickHandler implements ChannelCallbackHandler {
      */
     @Override
     public void handleChannelData(final String action, final JSONArray jsonArray) throws BitfinexClientException {
-        BitfinexTick tick = jsonToBitfinexTick(jsonArray);
+        final boolean isFunding = symbol.getCurrency() instanceof BitfinexFundingCurrency;
+        final BitfinexTick tick = isFunding ? parseFundingTick(jsonArray) : parseTradingTick(jsonArray);
         tickConsumer.accept(symbol, tick);
     }
 
@@ -58,19 +60,21 @@ public class TickHandler implements ChannelCallbackHandler {
         return channelId;
     }
 
-    private BitfinexTick jsonToBitfinexTick(final JSONArray jsonArray) {
-        final BigDecimal bid = jsonArray.getBigDecimal(0); // 0 = BID
-        final BigDecimal bidSize = jsonArray.getBigDecimal(1);//  1 = BID SIZE
-        final BigDecimal ask = jsonArray.getBigDecimal(2); // 2 = ASK
-        final BigDecimal askSize = jsonArray.getBigDecimal(3);//  3 = ASK SIZE
-        final BigDecimal dailyChange = jsonArray.getBigDecimal(4);//  4 = Daily Change
-        final BigDecimal dailyChangePerc = jsonArray.getBigDecimal(5);// 5  = Daily Change %
-        final BigDecimal price = jsonArray.getBigDecimal(6);//  6 = Last Price
-        final BigDecimal volume = jsonArray.getBigDecimal(7); // 7 = Volume
-        final BigDecimal high = jsonArray.getBigDecimal(8); // 8 = High
-        final BigDecimal low = jsonArray.getBigDecimal(9); // 9 = Low
+    // Trading layout: BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_REL, LAST_PRICE, VOLUME, HIGH, LOW
+    private static BitfinexTick parseTradingTick(final JSONArray a) {
+        return new BitfinexTick(
+                a.getBigDecimal(0), a.getBigDecimal(1), a.getBigDecimal(2), a.getBigDecimal(3),
+                a.getBigDecimal(4), a.getBigDecimal(5), a.getBigDecimal(6), a.getBigDecimal(7),
+                a.getBigDecimal(8), a.getBigDecimal(9));
+    }
 
-        return new BitfinexTick(bid, bidSize, ask, askSize, dailyChange, dailyChangePerc, price, volume, high, low);
+    // Funding layout: FRR, BID, BID_PERIOD, BID_SIZE, ASK, ASK_PERIOD, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_REL, LAST_PRICE, VOLUME, HIGH, LOW
+    private static BitfinexFundingTick parseFundingTick(final JSONArray a) {
+        return new BitfinexFundingTick(
+                a.getBigDecimal(0), a.getBigDecimal(1), a.getBigDecimal(2), a.getBigDecimal(3),
+                a.getBigDecimal(4), a.getBigDecimal(5), a.getBigDecimal(6), a.getBigDecimal(7),
+                a.getBigDecimal(8), a.getBigDecimal(9), a.getBigDecimal(10), a.getBigDecimal(11),
+                a.getBigDecimal(12));
     }
 
     /**

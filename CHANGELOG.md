@@ -1,5 +1,11 @@
 # Fork versions (oxefork)
 
+## 0.7.9-oxefork-p6 (2026-05-24)
+* Protocol (M8): funding ticker (`fXXX`) now parsed with its 13-field layout (`FRR, BID, BID_PERIOD, BID_SIZE, ASK, ASK_PERIOD, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_RELATIVE, LAST_PRICE, VOLUME, HIGH, LOW`); previously the 10-field trading layout was applied unconditionally, silently corrupting all field values for funding subscriptions
+* New model: `BitfinexFundingTick extends BitfinexTick` exposes `getFrr()`, `getBidPeriod()`, `getAskPeriod()`; existing `onTickEvent` consumers receive it transparently as `BitfinexTick`; cast to `BitfinexFundingTick` to access the three funding-only fields
+* `TickHandler` branches on `BitfinexFundingCurrency` at parse time; trading path is unchanged
+* Tests: `TickHandlerTest` — `testFundingTickUpdateAndNotify` (13-field parse, all fields verified, instance type asserted)
+
 ## 0.7.9-oxefork-p5 (2026-05-24)
 * Protocol (M6): added `mtsTimeInForce` (Long, nullable) to `BitfinexOrder` and `BitfinexSubmittedOrder`; `OrderHandler` now parses `MTS_TIF` from order array index 10 (was silently skipped); `OrderNewCommand` now sends `tif` when set; `BitfinexOrderBuilder` gains `withTimeInForce(epochMs)`
 * Protocol (M7): `OrderUpdateCommand` now serialises `price_trailing`, `price_aux_limit`, `delta`, and `tif` when non-null; `delta` (BigDecimal, nullable) added to `BitfinexSubmittedOrder` for relative amount updates
