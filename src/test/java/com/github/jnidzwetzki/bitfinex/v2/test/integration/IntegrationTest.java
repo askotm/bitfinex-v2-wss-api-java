@@ -137,6 +137,42 @@ public class IntegrationTest {
 	}
 
 	/**
+	 * Test the orderbook stream with len=100 (the other valid value beside 25)
+	 */
+	@Test(timeout=30000)
+	public void testOrderbookStreamLen100() {
+		final BitfinexWebsocketClient bitfinexClient = new SimpleBitfinexApiBroker(new BitfinexWebsocketConfiguration(), new BitfinexApiCallbackRegistry(), new SequenceNumberAuditor(), false);
+
+		final CountDownLatch latch = new CountDownLatch(10);
+		try {
+			bitfinexClient.connect();
+			final BitfinexOrderBookSymbol orderbookConfiguration = BitfinexSymbols.orderBook(
+					BitfinexCurrencyPair.of("BTC","USD"), BitfinexOrderBookSymbol.Precision.P0, BitfinexOrderBookSymbol.Frequency.F0, 100);
+
+			final OrderbookManager orderbookManager = bitfinexClient.getOrderbookManager();
+
+			final BiConsumer<BitfinexOrderBookSymbol, BitfinexOrderBookEntry> callback = (c, o) -> {
+				Assert.assertTrue(o.getAmount().doubleValue() != 0);
+				Assert.assertTrue(o.getPrice().doubleValue() != 0);
+				latch.countDown();
+			};
+
+			orderbookManager.registerOrderbookCallback(orderbookConfiguration, callback);
+			orderbookManager.subscribeOrderbook(orderbookConfiguration);
+			latch.await();
+
+			orderbookManager.unsubscribeOrderbook(orderbookConfiguration);
+			Assert.assertTrue(orderbookManager.removeOrderbookCallback(orderbookConfiguration, callback));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		} finally {
+			bitfinexClient.close();
+		}
+	}
+
+	/**
 	 * Test the raw orderbook stream
 	 */
 	@Test(timeout=30000)

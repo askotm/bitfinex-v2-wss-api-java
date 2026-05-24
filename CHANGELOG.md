@@ -1,3 +1,15 @@
+# Fork versions (oxefork)
+
+## 0.7.9-oxefork-p2 (2026-05-24)
+* Bugfix: `BitfinexOrderBookSymbol` accepted any `pricePoints` value in range 25–100; only `25` and `100` are valid per protocol
+* Integration test: added `testOrderbookStreamLen100` to verify both valid values work live
+
+## 0.7.9-oxefork-p1 (2026-05-24)
+* Bugfix: `OrderHandler` read `parentOrderId` from wrong array index (25 → 26); NOTIFY (index 24) and HIDDEN (index 25) were never parsed and are now surfaced on `BitfinexSubmittedOrder`
+* Added `hidden` field to `BitfinexSubmittedOrder` with `isHidden()` / `setHidden()`
+
+---
+
 # Version 0.7.9 (TBA)
 * Bugfix: Handle insufficient account balance error messages properly (thanks to GeekHare / closes #309)
 

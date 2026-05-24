@@ -70,8 +70,8 @@ public class BitfinexOrderBookSymbol implements BitfinexStreamSymbol {
 				throw new IllegalArgumentException("Price points must be != NULL");
 			}
 			
-			if (pricePoints < 25 || pricePoints > 100) {
-				throw new IllegalArgumentException("Price points must be between 25 and 100");
+			if (pricePoints != 25 && pricePoints != 100) {
+				throw new IllegalArgumentException("Price points must be 25 or 100");
 			}
 			this.pricePoints = pricePoints;
 		} else {
