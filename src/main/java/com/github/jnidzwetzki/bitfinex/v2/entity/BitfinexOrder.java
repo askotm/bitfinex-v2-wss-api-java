@@ -88,6 +88,11 @@ public class BitfinexOrder {
     private Set<BitfinexOrderFlag> orderFlags = new HashSet<>();
 
     /**
+     * Time-in-force expiry timestamp (milliseconds since epoch), null means GTC
+     */
+    private Long mtsTimeInForce;
+
+    /**
      * The affiliate code (optional)
      */
     private String affiliateCode;
@@ -185,6 +190,14 @@ public class BitfinexOrder {
         this.affiliateCode = affiliateCode;
     }
 
+    public Long getMtsTimeInForce() {
+        return mtsTimeInForce;
+    }
+
+    public void setMtsTimeInForce(final Long mtsTimeInForce) {
+        this.mtsTimeInForce = mtsTimeInForce;
+    }
+
     public String getApiKey() {
         return apiKey;
     }
@@ -230,7 +243,7 @@ public class BitfinexOrder {
 				+ currencyPair + ", amount=" + amount + ", orderType=" + orderType + ", price=" + price
 				+ ", priceTrailing=" + priceTrailing + ", priceAuxLimit=" + priceAuxLimit + ", priceOcoStop="
 				+ priceOcoStop + ", orderFlags=" + orderFlags + ", affiliateCode=" + affiliateCode + ", apiKey="
-				+ apiKey + ", leverage=" + leverage + "]";
+				+ apiKey + ", leverage=" + leverage + ", mtsTimeInForce=" + mtsTimeInForce + "]";
 	}
 
 	@Override
@@ -250,6 +263,7 @@ public class BitfinexOrder {
 		result = prime * result + ((priceOcoStop == null) ? 0 : priceOcoStop.hashCode());
 		result = prime * result + ((priceTrailing == null) ? 0 : priceTrailing.hashCode());
 		result = prime * result + ((affiliateCode == null) ? 0 : affiliateCode.hashCode());
+		result = prime * result + ((mtsTimeInForce == null) ? 0 : mtsTimeInForce.hashCode());
 		return result;
 	}
 
@@ -317,6 +331,11 @@ public class BitfinexOrder {
 			if (other.affiliateCode != null)
 				return false;
 		} else if (!affiliateCode.equals(other.affiliateCode))
+			return false;
+		if (mtsTimeInForce == null) {
+			if (other.mtsTimeInForce != null)
+				return false;
+		} else if (!mtsTimeInForce.equals(other.mtsTimeInForce))
 			return false;
 		return true;
 	}

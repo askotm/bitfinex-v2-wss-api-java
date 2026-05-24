@@ -107,7 +107,12 @@ public class OrderHandler implements ChannelCallbackHandler {
         order.setAmount(json.getBigDecimal(6));
         order.setAmountAtCreation(json.getBigDecimal(7));
         order.setOrderType(BitfinexOrderType.fromBifinexString(json.getString(8)));
-        
+
+        final String mtsTif = json.optString(10, null);
+        if (mtsTif != null) {
+            order.setMtsTimeInForce(Long.parseLong(mtsTif));
+        }
+
         final int flags = json.getInt(12);
         if (flags > 0) {      
         		order.setOrderFlags(flags);

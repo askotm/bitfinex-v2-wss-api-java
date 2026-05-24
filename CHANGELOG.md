@@ -1,5 +1,11 @@
 # Fork versions (oxefork)
 
+## 0.7.9-oxefork-p5 (2026-05-24)
+* Protocol (M6): added `mtsTimeInForce` (Long, nullable) to `BitfinexOrder` and `BitfinexSubmittedOrder`; `OrderHandler` now parses `MTS_TIF` from order array index 10 (was silently skipped); `OrderNewCommand` now sends `tif` when set; `BitfinexOrderBuilder` gains `withTimeInForce(epochMs)`
+* Protocol (M7): `OrderUpdateCommand` now serialises `price_trailing`, `price_aux_limit`, `delta`, and `tif` when non-null; `delta` (BigDecimal, nullable) added to `BitfinexSubmittedOrder` for relative amount updates
+* Tests: `OrderHandlerTest` — `parsesTifTimestampFromOrderArray`, `parsesTifNullWhenAbsent`; `CommandsTest` — `testOrderNewCommandIncludesTif`, `testOrderNewCommandOmitsTifWhenAbsent`, `testOrderUpdateCommandIncludesAllOptionalFields`, `testOrderUpdateCommandOmitsOptionalFieldsWhenAbsent`
+* Cleanup: `OrderHandlerTest` de-duplicated JSON fixture via `parseOrder(type, tifLiteral)` helper; `CommandsTest` replaced inline `java.math.BigDecimal` references with a proper import; `BitfinexOrder.setMtsTimeInForce` parameter marked `final` for consistency
+
 ## 0.7.9-oxefork-p4 (2026-05-24)
 * Protocol (M1): added `HOUR_2 ("2h")`, `HOUR_4 ("4h")`, `WEEK_1 ("1W")` to `BitfinexCandleTimeFrame`; `fromSymbolString` previously threw on these server-sent keys
 * Protocol (M3): added `FOK (8)`, `IOC (16)`, `TIMESTAMP (32768)` to `BitfinexOrderFlag`; bits 8/16 were silently dropped by `setOrderFlags(int)`

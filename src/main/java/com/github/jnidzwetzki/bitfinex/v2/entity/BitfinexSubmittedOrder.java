@@ -91,6 +91,11 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
      */
     private boolean hidden;
 
+    /**
+     * Relative amount change for order updates (signed)
+     */
+    private BigDecimal delta;
+
     public Long getOrderId() {
         return orderId;
     }
@@ -197,6 +202,14 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
         this.hidden = hidden;
     }
 
+    public BigDecimal getDelta() {
+        return delta;
+    }
+
+    public void setDelta(BigDecimal delta) {
+        this.delta = delta;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -214,12 +227,13 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
                 status == that.status &&
                 Objects.equals(priceAverage, that.priceAverage) &&
                 Objects.equals(parentOrderId, that.parentOrderId) &&
-                parentOrderType == that.parentOrderType;
+                parentOrderType == that.parentOrderType &&
+                Objects.equals(delta, that.delta);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), orderId, createdTimestamp, updatedTimestamp, amount, amountAtCreation, status, priceAverage, parentOrderId, parentOrderType, noVarRates, notify, hidden);
+        return Objects.hash(super.hashCode(), orderId, createdTimestamp, updatedTimestamp, amount, amountAtCreation, status, priceAverage, parentOrderId, parentOrderType, noVarRates, notify, hidden, delta);
     }
 
     @Override
@@ -238,6 +252,7 @@ public class BitfinexSubmittedOrder extends BitfinexOrder {
                 ", noVarRates=" + noVarRates +
                 ", notify=" + notify +
                 ", hidden=" + hidden +
+                ", delta=" + delta +
                 ']';
     }
 }

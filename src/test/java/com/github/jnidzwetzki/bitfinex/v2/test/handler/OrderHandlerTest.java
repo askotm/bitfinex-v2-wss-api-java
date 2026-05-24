@@ -53,19 +53,40 @@ public class OrderHandlerTest {
         assertOrderTypeParsed("EXCHANGE IOC", BitfinexOrderType.EXCHANGE_IOC);
     }
 
+    @Test
+    public void parsesTifTimestampFromOrderArray() throws BitfinexClientException {
+        final List<BitfinexSubmittedOrder> orders = parseOrderWithTif("1700000000000");
+        Assert.assertEquals(1, orders.size());
+        Assert.assertEquals(Long.valueOf(1700000000000L), orders.get(0).getMtsTimeInForce());
+    }
+
+    @Test
+    public void parsesTifNullWhenAbsent() throws BitfinexClientException {
+        final List<BitfinexSubmittedOrder> orders = parseOrderWithTif("null");
+        Assert.assertEquals(1, orders.size());
+        Assert.assertNull(orders.get(0).getMtsTimeInForce());
+    }
+
     private void assertOrderTypeParsed(String protocolString, BitfinexOrderType expected) throws BitfinexClientException {
-        final List<BitfinexSubmittedOrder> orders = parseOrder(protocolString);
+        final List<BitfinexSubmittedOrder> orders = parseOrder(protocolString, "null");
         Assert.assertEquals(1, orders.size());
         Assert.assertEquals(expected, orders.get(0).getOrderType());
     }
 
-    private List<BitfinexSubmittedOrder> parseOrder(String orderTypeString) throws BitfinexClientException {
-        // Order array with the given type at index 8 (status ACTIVE, price 6800)
-        final String json = "[123,null,1514956504945000,\"tBTCUSD\",1514956505134,"
-                + "1514956505164,-1.0,-1.0,\"" + orderTypeString + "\",null,null,null,0,\"ACTIVE\","
-                + "null,null,6800,0,null,null,null,null,null,0,0,0]";
-        final JSONArray payload = new JSONArray(json);
+    private List<BitfinexSubmittedOrder> parseOrderWithTif(String tifLiteral) throws BitfinexClientException {
+        return parseOrder("EXCHANGE LIMIT", tifLiteral);
+    }
 
+    // index 8 = type, index 10 = MTS_TIF
+    private List<BitfinexSubmittedOrder> parseOrder(String orderTypeString, String tifLiteral) throws BitfinexClientException {
+        final String json = "[123,null,1514956504945000,\"tBTCUSD\",1514956505134,"
+                + "1514956505164,-1.0,-1.0,\"" + orderTypeString + "\",null," + tifLiteral + ",null,0,\"ACTIVE\","
+                + "null,null,6800,0,null,null,null,null,null,0,0,0]";
+        return parseOrderFromJson(json);
+    }
+
+    private List<BitfinexSubmittedOrder> parseOrderFromJson(String json) throws BitfinexClientException {
+        final JSONArray payload = new JSONArray(json);
         final List<BitfinexSubmittedOrder> received = new ArrayList<>();
         final OrderHandler handler = new OrderHandler(0,
                 BitfinexSymbols.account(BitfinexApiKeyPermissions.ALL_PERMISSIONS, "key"));

@@ -36,6 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -129,6 +130,54 @@ public class CommandsTest {
 		Assert.assertTrue(commandValue.contains("\"lev\":5"));
 		Assert.assertTrue(commandValue.contains("\"price_oco_stop\":\"24.0\""));
 		Assert.assertTrue(commandValue.contains("\"aff_code\":\"qYpFPFPs\""));
+	}
+
+	@Test
+	public void testOrderNewCommandIncludesTif() throws BitfinexCommandException {
+		final long tif = 1700000000000L;
+		final BitfinexOrder order = BitfinexOrderBuilder
+				.create(BitfinexCurrencyPair.of("BTC", "USD"), BitfinexOrderType.EXCHANGE_LIMIT, 1.0)
+				.withPrice(50000)
+				.withTimeInForce(tif)
+				.build();
+		final String command = new OrderNewCommand(order).getCommand(buildMockedBitfinexConnection());
+		Assert.assertTrue(command.contains("\"tif\":" + tif));
+	}
+
+	@Test
+	public void testOrderNewCommandOmitsTifWhenAbsent() throws BitfinexCommandException {
+		final BitfinexOrder order = BitfinexOrderBuilder
+				.create(BitfinexCurrencyPair.of("BTC", "USD"), BitfinexOrderType.EXCHANGE_LIMIT, 1.0)
+				.withPrice(50000)
+				.build();
+		final String command = new OrderNewCommand(order).getCommand(buildMockedBitfinexConnection());
+		Assert.assertFalse(command.contains("\"tif\""));
+	}
+
+	@Test
+	public void testOrderUpdateCommandIncludesAllOptionalFields() throws BitfinexCommandException {
+		final BitfinexSubmittedOrder order = new BitfinexSubmittedOrder();
+		order.setOrderId(42L);
+		order.setPriceTrailing(new BigDecimal("100.5"));
+		order.setPriceAuxLimit(new BigDecimal("200.0"));
+		order.setDelta(new BigDecimal("0.5"));
+		order.setMtsTimeInForce(1700000000000L);
+		final String command = new OrderUpdateCommand(order).getCommand(buildMockedBitfinexConnection());
+		Assert.assertTrue(command.contains("\"price_trailing\":\"100.5\""));
+		Assert.assertTrue(command.contains("\"price_aux_limit\":\"200.0\""));
+		Assert.assertTrue(command.contains("\"delta\":\"0.5\""));
+		Assert.assertTrue(command.contains("\"tif\":1700000000000"));
+	}
+
+	@Test
+	public void testOrderUpdateCommandOmitsOptionalFieldsWhenAbsent() throws BitfinexCommandException {
+		final BitfinexSubmittedOrder order = new BitfinexSubmittedOrder();
+		order.setOrderId(42L);
+		final String command = new OrderUpdateCommand(order).getCommand(buildMockedBitfinexConnection());
+		Assert.assertFalse(command.contains("\"price_trailing\""));
+		Assert.assertFalse(command.contains("\"price_aux_limit\""));
+		Assert.assertFalse(command.contains("\"delta\""));
+		Assert.assertFalse(command.contains("\"tif\""));
 	}
 
 	@Test

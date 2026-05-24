@@ -43,6 +43,18 @@ public class OrderUpdateCommand implements BitfinexOrderCommand {
         if (bitfinexOrder.getPrice() != null) {
             orderJson.put("price", bitfinexOrder.getPrice().toString());
         }
+        if (bitfinexOrder.getPriceTrailing() != null) {
+            orderJson.put("price_trailing", bitfinexOrder.getPriceTrailing().toString());
+        }
+        if (bitfinexOrder.getPriceAuxLimit() != null) {
+            orderJson.put("price_aux_limit", bitfinexOrder.getPriceAuxLimit().toString());
+        }
+        if (bitfinexOrder.getDelta() != null) {
+            orderJson.put("delta", bitfinexOrder.getDelta().toString());
+        }
+        if (bitfinexOrder.getMtsTimeInForce() != null) {
+            orderJson.put("tif", bitfinexOrder.getMtsTimeInForce());
+        }
 
         orderJson.put("cid", bitfinexOrder.getClientId());
         bitfinexOrder.getClientGroupId().ifPresent(groupId -> orderJson.put("gid", bitfinexOrder.getClientGroupId().get()));

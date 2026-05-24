@@ -40,6 +40,7 @@ public class BitfinexOrderBuilder {
 	private Set<BitfinexOrderFlag> orderFlags;
 	private long groupid = -1;
 	private String affiliateCode;
+	private Long mtsTimeInForce;
 
 	private BitfinexOrderBuilder(final BitfinexCurrencyPair symbol, final BitfinexOrderType type, 
 			final BigDecimal amount) {
@@ -122,6 +123,11 @@ public class BitfinexOrderBuilder {
 		return this;
 	}
 
+	public BitfinexOrderBuilder withTimeInForce(final long epochMs) {
+		this.mtsTimeInForce = epochMs;
+		return this;
+	}
+
 	public BitfinexOrder build() {
 		final BitfinexOrder order = new BitfinexOrder();
 		order.setClientId(System.currentTimeMillis());
@@ -135,11 +141,12 @@ public class BitfinexOrderBuilder {
 		order.setPriceOcoStop(priceOcoStop);
 		order.setOrderFlags(orderFlags);
 		order.setAffiliateCode(affiliateCode);
-		
+		order.setMtsTimeInForce(mtsTimeInForce);
+
 		if(groupid != -1) {
 			order.setClientGroupId(groupid);
 		}
-		
+
 		return order;
 	}
 

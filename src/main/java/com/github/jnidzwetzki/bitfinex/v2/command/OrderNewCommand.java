@@ -55,6 +55,9 @@ public class OrderNewCommand implements BitfinexOrderCommand {
         if (!bitfinexOrder.getOrderFlags().isEmpty()) {
             orderJson.put("flags", bitfinexOrder.getCombinedFlags());
         }
+        if (bitfinexOrder.getMtsTimeInForce() != null) {
+            orderJson.put("tif", bitfinexOrder.getMtsTimeInForce());
+        }
         orderJson.put("cid", bitfinexOrder.getClientId());
         bitfinexOrder.getClientGroupId().ifPresent(groupId -> orderJson.put("gid", bitfinexOrder.getClientGroupId().get()));
         if (bitfinexOrder.getAffiliateCode() != null) {
