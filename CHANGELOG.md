@@ -1,5 +1,9 @@
 # Fork versions (oxefork)
 
+## 0.7.9-oxefork-p3 (2026-05-24)
+* Protocol fix (M2): added `IOC` and `EXCHANGE_IOC` to `BitfinexOrderType`; `OrderHandler` previously threw `IllegalArgumentException` when the server sent either type
+* Tests: added `BitfinexOrderTypeTest` (round-trips all protocol type strings) and `OrderHandlerTest` (parses IOC / EXCHANGE IOC through the full handler path)
+
 ## 0.7.9-oxefork-p2 (2026-05-24)
 * Bugfix: `BitfinexOrderBookSymbol` accepted any `pricePoints` value in range 25–100; only `25` and `100` are valid per protocol
 * Integration test: added `testOrderbookStreamLen100` to verify both valid values work live
