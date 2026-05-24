@@ -17,6 +17,7 @@
  *******************************************************************************/
 package com.github.jnidzwetzki.bitfinex.v2;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
@@ -82,7 +83,7 @@ public class BitfinexWebsocketConfiguration {
      */
     private boolean autoReconnect = true;
 
-    private String websocketEndpointUrl = SimpleBitfinexApiBroker.BITFINEX_URI;
+    private String websocketEndpointUrl = SimpleBitfinexApiBroker.BITFINEX_URI_PUBLIC;
 
     public BitfinexWebsocketConfiguration() {
 
@@ -115,6 +116,9 @@ public class BitfinexWebsocketConfiguration {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
         this.authenticationEnabled = true;
+        if (Objects.equals(this.websocketEndpointUrl, SimpleBitfinexApiBroker.BITFINEX_URI_PUBLIC)) {
+            this.websocketEndpointUrl = SimpleBitfinexApiBroker.BITFINEX_URI;
+        }
     }
 
     public String getApiKey() {

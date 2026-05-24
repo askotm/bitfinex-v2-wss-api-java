@@ -82,10 +82,8 @@ import com.google.common.base.Stopwatch;
 
 public class SimpleBitfinexApiBroker implements Closeable, BitfinexWebsocketClient {
 
-	/**
-	 * The bitfinex api
-	 */
-	public final static String BITFINEX_URI = "wss://api.bitfinex.com/ws/2";
+	public final static String BITFINEX_URI        = "wss://api.bitfinex.com/ws/2";
+	public final static String BITFINEX_URI_PUBLIC = "wss://api-pub.bitfinex.com/ws/2";
 
 	/**
 	 * The account info channel id

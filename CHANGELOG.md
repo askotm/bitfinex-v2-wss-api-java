@@ -1,5 +1,10 @@
 # Fork versions (oxefork)
 
+## 0.7.9-oxefork-p7 (2026-05-24)
+* Protocol (M10): added `BITFINEX_URI_PUBLIC = "wss://api-pub.bitfinex.com/ws/2"` constant to `SimpleBitfinexApiBroker`; `BitfinexWebsocketConfiguration` now defaults to the public endpoint instead of the authenticated one — unauthenticated clients no longer hit the stricter auth endpoint rate limit (5 conn/15 s vs 20 conn/min)
+* `setApiCredentials()` automatically switches the endpoint from public to authenticated; a custom URL set via `setWebsocketEndpointUrl()` before calling `setApiCredentials()` is preserved unchanged
+* Tests: `BitfinexWebsocketConfigurationTest` — five unit tests covering default URL, `setApiCredentials` auto-switch, custom URL preservation, and copy-constructor fidelity; integration tests restructured: `IntegrationTest` renamed to `AbstractPublicChannelIntegrationTest` (history preserved via rename), `PublicEndpointIntegrationTest` and `AuthEndpointIntegrationTest` extend it — the full public-channel suite now runs against both endpoints
+
 ## 0.7.9-oxefork-p6 (2026-05-24)
 * Protocol (M8): funding ticker (`fXXX`) now parsed with its 13-field layout (`FRR, BID, BID_PERIOD, BID_SIZE, ASK, ASK_PERIOD, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_RELATIVE, LAST_PRICE, VOLUME, HIGH, LOW`); previously the 10-field trading layout was applied unconditionally, silently corrupting all field values for funding subscriptions
 * New model: `BitfinexFundingTick extends BitfinexTick` exposes `getFrr()`, `getBidPeriod()`, `getAskPeriod()`; existing `onTickEvent` consumers receive it transparently as `BitfinexTick`; cast to `BitfinexFundingTick` to access the three funding-only fields
