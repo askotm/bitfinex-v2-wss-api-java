@@ -17,7 +17,6 @@
  *******************************************************************************/
 package com.github.jnidzwetzki.bitfinex.v2;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
@@ -116,7 +115,8 @@ public class BitfinexWebsocketConfiguration {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
         this.authenticationEnabled = true;
-        if (Objects.equals(this.websocketEndpointUrl, SimpleBitfinexApiBroker.BITFINEX_URI_PUBLIC)) {
+        // switch off the public default; a custom URL set beforehand is preserved
+        if (SimpleBitfinexApiBroker.BITFINEX_URI_PUBLIC.equals(this.websocketEndpointUrl)) {
             this.websocketEndpointUrl = SimpleBitfinexApiBroker.BITFINEX_URI;
         }
     }
