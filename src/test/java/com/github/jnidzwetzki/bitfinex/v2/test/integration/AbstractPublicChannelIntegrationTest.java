@@ -452,9 +452,9 @@ public abstract class AbstractPublicChannelIntegrationTest {
 		// Register some ticket to get some sequence numbers
 		final BitfinexTickerSymbol symbol1 = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("BTC","USD"));
 		final BitfinexTickerSymbol symbol2 = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("ETH","USD"));
-		final BitfinexTickerSymbol symbol3 = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("EOS","USD"));
+		final BitfinexTickerSymbol symbol3 = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("LTC","USD"));
 		final BitfinexTickerSymbol symbol4 = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("DOGE","USD"));
-		final BitfinexTickerSymbol symbol5 = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("NEO","USD"));
+		final BitfinexTickerSymbol symbol5 = BitfinexSymbols.ticker(BitfinexCurrencyPair.of("XRP","USD"));
 
 		final QuoteManager orderbookManager = bitfinexClient.getQuoteManager();
 

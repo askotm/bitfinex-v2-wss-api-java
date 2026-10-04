@@ -94,7 +94,7 @@ public class CommandsCallbackTest {
 	 */
 	@Test
 	public void testSubscribeAndUnsubscribeCallback() throws BitfinexClientException {
-		final String subscribeJson = "{\"event\":\"subscribed\",\"channel\":\"ticker\",\"chanId\":30,\"symbol\":\"tNEOUSD\",\"pair\":\"NEOUSD\"}";
+		final String subscribeJson = "{\"event\":\"subscribed\",\"channel\":\"ticker\",\"chanId\":30,\"symbol\":\"tBTCUSD\",\"pair\":\"BTCUSD\"}";
 		final SubscribedCallback subscribedCallback = new SubscribedCallback();
 		subscribedCallback.onSubscribedEvent((chanId, sym) -> {
 			Assert.assertEquals((Integer) 30, chanId);
