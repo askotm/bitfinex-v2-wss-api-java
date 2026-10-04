@@ -1,5 +1,11 @@
 # Fork versions (oxefork)
 
+## 0.7.9-oxefork-p8 (2026-10-04)
+* Protocol (M11): added `FOK_CANCELED ("FILLORKILL CANCELED")` and `IOC_CANCELED ("IOC CANCELED")` to `BitfinexSubmittedOrderStatus`; `fromString` previously threw `IllegalArgumentException` on both, which escaped `OrderHandler` uncaught, so the order update for a killed FOK / cancelled IOC order never reached the order callbacks
+* `OrderManager` now treats `POSTONLY_CANCELED`, `FOK_CANCELED` and `IOC_CANCELED` like `CANCELED`: the order is removed from `getOrders()` and `cancelOrderAndWaitForCompletion` accepts it as cancelled; behaviour change for `POSTONLY_CANCELED`, which previously stayed in `getOrders()` indefinitely
+* Consumers with an exhaustive `switch` over `BitfinexSubmittedOrderStatus` must handle the two new values
+* Tests: `BitfinexOrderTest` — `testStateFromStringExchangeCanceled`, `testStateFromStringCanceledUnchanged`, `testStateStringsAreNotPrefixesOfEachOther`; `OrderHandlerTest` — `parsesKilledFokOrder` (`EXCHANGE FOK` / `FILLORKILL CANCELED` through the full handler path); `OrderManagerTest` — `testExchangeCanceledOrdersAreRemoved`
+
 ## 0.7.9-oxefork-p7 (2026-05-24)
 * Protocol (M10): added `BITFINEX_URI_PUBLIC = "wss://api-pub.bitfinex.com/ws/2"` constant to `SimpleBitfinexApiBroker`; `BitfinexWebsocketConfiguration` now defaults to the public endpoint instead of the authenticated one — unauthenticated clients no longer hit the stricter auth endpoint rate limit (5 conn/15 s vs 20 conn/min)
 * `setApiCredentials()` automatically switches the endpoint from public to authenticated; a custom URL set via `setWebsocketEndpointUrl()` before calling `setApiCredentials()` is preserved unchanged

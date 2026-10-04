@@ -17,6 +17,7 @@
  *******************************************************************************/
 package com.github.jnidzwetzki.bitfinex.v2.test.handler;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import com.github.jnidzwetzki.bitfinex.v2.callback.channel.account.info.OrderHan
 import com.github.jnidzwetzki.bitfinex.v2.entity.BitfinexApiKeyPermissions;
 import com.github.jnidzwetzki.bitfinex.v2.entity.BitfinexOrderType;
 import com.github.jnidzwetzki.bitfinex.v2.entity.BitfinexSubmittedOrder;
+import com.github.jnidzwetzki.bitfinex.v2.entity.BitfinexSubmittedOrderStatus;
 import com.github.jnidzwetzki.bitfinex.v2.entity.currency.BitfinexCurrencyPair;
 import com.github.jnidzwetzki.bitfinex.v2.exception.BitfinexClientException;
 import com.github.jnidzwetzki.bitfinex.v2.symbol.BitfinexSymbols;
@@ -67,6 +69,18 @@ public class OrderHandlerTest {
         Assert.assertNull(orders.get(0).getMtsTimeInForce());
     }
 
+    @Test
+    public void parsesKilledFokOrder() throws BitfinexClientException {
+        final List<BitfinexSubmittedOrder> orders = parseOrder("EXCHANGE FOK", "null", "FILLORKILL CANCELED");
+        Assert.assertEquals(1, orders.size());
+
+        final BitfinexSubmittedOrder order = orders.get(0);
+        Assert.assertEquals(BitfinexSubmittedOrderStatus.FOK_CANCELED, order.getStatus());
+        Assert.assertEquals(BitfinexOrderType.EXCHANGE_FOK, order.getOrderType());
+        Assert.assertEquals(0, order.getAmount().compareTo(order.getAmountAtCreation()));
+        Assert.assertEquals(0, BigDecimal.ZERO.compareTo(order.getPriceAverage()));
+    }
+
     private void assertOrderTypeParsed(String protocolString, BitfinexOrderType expected) throws BitfinexClientException {
         final List<BitfinexSubmittedOrder> orders = parseOrder(protocolString, "null");
         Assert.assertEquals(1, orders.size());
@@ -77,10 +91,14 @@ public class OrderHandlerTest {
         return parseOrder("EXCHANGE LIMIT", tifLiteral);
     }
 
-    // index 8 = type, index 10 = MTS_TIF
     private List<BitfinexSubmittedOrder> parseOrder(String orderTypeString, String tifLiteral) throws BitfinexClientException {
+        return parseOrder(orderTypeString, tifLiteral, "ACTIVE");
+    }
+
+    // index 8 = type, index 10 = MTS_TIF, index 13 = status
+    private List<BitfinexSubmittedOrder> parseOrder(String orderTypeString, String tifLiteral, String statusString) throws BitfinexClientException {
         final String json = "[123,null,1514956504945000,\"tBTCUSD\",1514956505134,"
-                + "1514956505164,-1.0,-1.0,\"" + orderTypeString + "\",null," + tifLiteral + ",null,0,\"ACTIVE\","
+                + "1514956505164,-1.0,-1.0,\"" + orderTypeString + "\",null," + tifLiteral + ",null,0,\"" + statusString + "\","
                 + "null,null,6800,0,null,null,null,null,null,0,0,0]";
         return parseOrderFromJson(json);
     }

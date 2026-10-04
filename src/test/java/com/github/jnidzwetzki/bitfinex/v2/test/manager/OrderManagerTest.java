@@ -263,6 +263,32 @@ public class OrderManagerTest {
         orderManager.cancelOrderAndWaitForCompletion(12);
     }
 
+    @Test
+    public void testExchangeCanceledOrdersAreRemoved() throws BitfinexClientException {
+        final BitfinexWebsocketClient bitfinexApiBroker = TestHelper.buildMockedBitfinexConnection();
+        final OrderManager orderManager = bitfinexApiBroker.getOrderManager();
+        final BitfinexAccountSymbol symbol = BitfinexSymbols.account(BitfinexApiKeyPermissions.ALL_PERMISSIONS, "apiKey");
+
+        final BitfinexSubmittedOrderStatus[] canceledStates = {BitfinexSubmittedOrderStatus.CANCELED,
+                BitfinexSubmittedOrderStatus.POSTONLY_CANCELED, BitfinexSubmittedOrderStatus.FOK_CANCELED,
+                BitfinexSubmittedOrderStatus.IOC_CANCELED};
+
+        for (final BitfinexSubmittedOrderStatus canceledState : canceledStates) {
+            orderManager.updateOrderCallback(symbol, orderWithStatus(BitfinexSubmittedOrderStatus.ACTIVE));
+            Assert.assertEquals(1, orderManager.getOrders().size());
+
+            orderManager.updateOrderCallback(symbol, orderWithStatus(canceledState));
+            Assert.assertTrue(canceledState.toString(), orderManager.getOrders().isEmpty());
+        }
+    }
+
+    private static BitfinexSubmittedOrder orderWithStatus(final BitfinexSubmittedOrderStatus status) {
+        final BitfinexSubmittedOrder order = new BitfinexSubmittedOrder();
+        order.setOrderId(12L);
+        order.setStatus(status);
+        return order;
+    }
+
     /**
      * Test the placement of an order
      *

@@ -112,7 +112,7 @@ public class OrderManager extends SimpleCallbackManager<BitfinexSubmittedOrder> 
 			orders.removeIf(o -> Objects.equals(o.getOrderId(), exchangeOrder.getOrderId()));
 
 			// Remove canceled orders
-			if(exchangeOrder.getStatus() != BitfinexSubmittedOrderStatus.CANCELED) {
+			if(! isCanceled(exchangeOrder.getStatus())) {
 				orders.add(exchangeOrder);
 			}
 
@@ -120,6 +120,13 @@ public class OrderManager extends SimpleCallbackManager<BitfinexSubmittedOrder> 
 		}
 
 		notifyCallbacks(exchangeOrder);
+	}
+
+	private static boolean isCanceled(final BitfinexSubmittedOrderStatus status) {
+		return status == BitfinexSubmittedOrderStatus.CANCELED
+				|| status == BitfinexSubmittedOrderStatus.POSTONLY_CANCELED
+				|| status == BitfinexSubmittedOrderStatus.FOK_CANCELED
+				|| status == BitfinexSubmittedOrderStatus.IOC_CANCELED;
 	}
 
 
@@ -261,7 +268,7 @@ public class OrderManager extends SimpleCallbackManager<BitfinexSubmittedOrder> 
 		final CountDownLatch waitLatch = new CountDownLatch(1);
 
 		final Consumer<BitfinexSubmittedOrder> ordercallback = (o) -> {
-			if(o.getOrderId() == id && o.getStatus() == BitfinexSubmittedOrderStatus.CANCELED) {
+			if(o.getOrderId() == id && isCanceled(o.getStatus())) {
 				waitLatch.countDown();
 			}
 		};

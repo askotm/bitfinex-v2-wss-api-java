@@ -51,6 +51,37 @@ public class BitfinexOrderTest {
 		Assert.assertEquals(BitfinexSubmittedOrderStatus.POSTONLY_CANCELED, BitfinexSubmittedOrderStatus.fromString("POSTONLY CANCELED"));
 	}
 	
+	@Test
+	public void testStateFromStringExchangeCanceled() {
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.FOK_CANCELED, BitfinexSubmittedOrderStatus.fromString("FILLORKILL CANCELED"));
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.IOC_CANCELED, BitfinexSubmittedOrderStatus.fromString("IOC CANCELED"));
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.FOK_CANCELED, BitfinexSubmittedOrderStatus.fromString("FILLORKILL CANCELED was: ACTIVE"));
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.IOC_CANCELED, BitfinexSubmittedOrderStatus.fromString("IOC CANCELED was: PARTIALLY FILLED @ 98.4(-0.1)"));
+	}
+
+	@Test
+	public void testStateFromStringCanceledUnchanged() {
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.CANCELED, BitfinexSubmittedOrderStatus.fromString("CANCELED"));
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.CANCELED, BitfinexSubmittedOrderStatus.fromString("CANCELED was: PARTIALLY FILLED @ 98.4(-0.1)"));
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.POSTONLY_CANCELED, BitfinexSubmittedOrderStatus.fromString("POSTONLY CANCELED"));
+	}
+
+	@Test
+	public void testStateStringsAreNotPrefixesOfEachOther() {
+		final String[] statusStrings = {"ACTIVE", "EXECUTED", "PARTIALLY FILLED", "POSTONLY CANCELED",
+				"FILLORKILL CANCELED", "IOC CANCELED", "CANCELED", "ERROR"};
+		Assert.assertEquals(BitfinexSubmittedOrderStatus.values().length, statusStrings.length);
+		for(final String statusString : statusStrings) {
+			final BitfinexSubmittedOrderStatus status = BitfinexSubmittedOrderStatus.fromString(statusString);
+			for(final String other : statusStrings) {
+				if(! other.equals(statusString)) {
+					Assert.assertFalse(statusString + " / " + other, other.startsWith(statusString));
+					Assert.assertNotEquals(status, BitfinexSubmittedOrderStatus.fromString(other));
+				}
+			}
+		}
+	}
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testStateFromStringInvalid() {
 		BitfinexSubmittedOrderStatus.fromString("ABC");
